@@ -13,8 +13,8 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
-      retries: 10
-      start_period: 30s
+      retries: 30
+      start_period: 120s
 
   api:
     build: .
@@ -45,6 +45,10 @@ services:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
+    volumes:
+      - .:/var/www/html
+      - /var/www/html/vendor
+      - ../data.json:/var/www/html/data.json:ro
     command: php seeds/seeder.php
     profiles:
       - seed

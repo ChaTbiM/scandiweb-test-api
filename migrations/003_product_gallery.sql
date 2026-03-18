@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS product_gallery (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id VARCHAR(255) NOT NULL,
+    image_url TEXT NOT NULL,
+    sort_order INT NOT NULL DEFAULT 0,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
