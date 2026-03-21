@@ -1,40 +1,84 @@
 <?php
 
+declare(strict_types=1);
+
+use App\Controller\GraphQL;
+use Dotenv\Dotenv;
+use FastRoute\Dispatcher;
+use FastRoute\RouteCollector;
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
-$dotenv->safeLoad();
+$sendJsonResponse = static function (int $statusCode, array $payload, array $headers = []): never {
+    http_response_code($statusCode);
+    header('Content-Type: application/json; charset=UTF-8');
 
-$allowedOrigin = $_ENV['ALLOWED_ORIGIN'] ?? 'http://localhost:5173';
-header('Access-Control-Allow-Origin: ' . $allowedOrigin);
-header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
+    foreach ($headers as $name => $value) {
+        header($name . ': ' . $value);
+    }
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(204);
+    echo json_encode($payload, JSON_UNESCAPED_SLASHES);
     exit;
-}
+};
 
-$dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $routeCollector) {
-    $routeCollector->post('/graphql', [App\Controller\GraphQL::class, 'handle']);
-});
+try {
+    $dotenv = Dotenv::createImmutable(dirname(__DIR__));
+    $dotenv->safeLoad();
 
-$routeInfo = $dispatcher->dispatch(
-    $_SERVER['REQUEST_METHOD'],
-    $_SERVER['REQUEST_URI']
-);
+    $allowedOrigin = $_ENV['ALLOWED_ORIGIN'] ?? 'http://localhost:5173';
+    header('Access-Control-Allow-Origin: ' . $allowedOrigin);
+    header('Access-Control-Allow-Methods: POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
-switch ($routeInfo[0]) {
-    case FastRoute\Dispatcher::NOT_FOUND:
-        // ... 404 Not Found
-        break;
-    case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
-        $allowedMethods = $routeInfo[1];
-        // ... 405 Method Not Allowed
-        break;
-    case FastRoute\Dispatcher::FOUND:
-        $handler = $routeInfo[1];
-        $vars = $routeInfo[2];
-        echo $handler($vars);
-        break;
+    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
+        http_response_code(204);
+        exit;
+    }
+
+    $dispatcher = FastRoute\simpleDispatcher(static function (RouteCollector $routeCollector): void {
+        $routeCollector->post('/graphql', [GraphQL::class, 'handle']);
+    });
+
+    $requestMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+    $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+    $queryStringPosition = strpos($requestUri, '?');
+
+    if ($queryStringPosition !== false) {
+        $requestUri = substr($requestUri, 0, $queryStringPosition);
+    }
+
+    $routeInfo = $dispatcher->dispatch($requestMethod, rawurldecode($requestUri));
+
+    switch ($routeInfo[0]) {
+        case Dispatcher::NOT_FOUND:
+            $sendJsonResponse(404, [
+                'error' => [
+                    'message' => 'Not Found',
+                ],
+            ]);
+
+        case Dispatcher::METHOD_NOT_ALLOWED:
+            $allowedMethods = implode(', ', $routeInfo[1]);
+
+            $sendJsonResponse(
+                405,
+                [
+                    'error' => [
+                        'message' => 'Method Not Allowed',
+                    ],
+                ],
+                ['Allow' => $allowedMethods]
+            );
+
+        case Dispatcher::FOUND:
+            $handler = $routeInfo[1];
+            echo call_user_func($handler);
+            break;
+    }
+} catch (Throwable $throwable) {
+    $sendJsonResponse(500, [
+        'error' => [
+            'message' => 'Internal Server Error',
+        ],
+    ]);
 }

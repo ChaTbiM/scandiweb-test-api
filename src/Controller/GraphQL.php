@@ -1,74 +1,81 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
+use App\GraphQL\Schema;
+use GraphQL\Error\FormattedError;
 use GraphQL\GraphQL as GraphQLBase;
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\Type;
-use GraphQL\Type\Schema;
-use GraphQL\Type\SchemaConfig;
+use JsonException;
 use RuntimeException;
 use Throwable;
 
-class GraphQL {
-    static public function handle() {
+class GraphQL
+{
+    public static function handle(): string
+    {
+        header('Content-Type: application/json; charset=UTF-8');
+
         try {
-            $queryType = new ObjectType([
-                'name' => 'Query',
-                'fields' => [
-                    'echo' => [
-                        'type' => Type::string(),
-                        'args' => [
-                            'message' => ['type' => Type::string()],
-                        ],
-                        'resolve' => static fn ($rootValue, array $args): string => $rootValue['prefix'] . $args['message'],
-                    ],
-                ],
-            ]);
-        
-            $mutationType = new ObjectType([
-                'name' => 'Mutation',
-                'fields' => [
-                    'sum' => [
-                        'type' => Type::int(),
-                        'args' => [
-                            'x' => ['type' => Type::int()],
-                            'y' => ['type' => Type::int()],
-                        ],
-                        'resolve' => static fn ($calc, array $args): int => $args['x'] + $args['y'],
-                    ],
-                ],
-            ]);
-        
-            // See docs on schema options:
-            // https://webonyx.github.io/graphql-php/schema-definition/#configuration-options
-            $schema = new Schema(
-                (new SchemaConfig())
-                ->setQuery($queryType)
-                ->setMutation($mutationType)
-            );
-        
+            FormattedError::setInternalErrorMessage('Internal Server Error');
+
             $rawInput = file_get_contents('php://input');
+
             if ($rawInput === false) {
-                throw new RuntimeException('Failed to get php://input');
+                throw new RuntimeException('Unable to read request body.');
             }
-        
-            $input = json_decode($rawInput, true);
-            $query = $input['query'];
+
+            $input = self::decodeRequestBody($rawInput);
+            $query = $input['query'] ?? null;
+
+            if (!is_string($query) || trim($query) === '') {
+                throw new RuntimeException('Missing GraphQL query.');
+            }
+
             $variableValues = $input['variables'] ?? null;
-        
-            $rootValue = ['prefix' => 'You said: '];
-            $result = GraphQLBase::executeQuery($schema, $query, $rootValue, null, $variableValues);
-            $output = $result->toArray();
-        } catch (Throwable $e) {
-            $output = [
+            $operationName = $input['operationName'] ?? null;
+
+            $result = GraphQLBase::executeQuery(
+                Schema::build(),
+                $query,
+                null,
+                null,
+                is_array($variableValues) ? $variableValues : null,
+                is_string($operationName) ? $operationName : null
+            );
+
+            return json_encode($result->toArray(), JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        } catch (Throwable $throwable) {
+            http_response_code(500);
+
+            return json_encode([
                 'error' => [
-                    'message' => $e->getMessage(),
+                    'message' => 'Internal Server Error',
                 ],
-            ];
+            ], JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function decodeRequestBody(string $rawInput): array
+    {
+        if (trim($rawInput) === '') {
+            return [];
         }
 
-        header('Content-Type: application/json; charset=UTF-8');
-        return json_encode($output);
+        try {
+            $decoded = json_decode($rawInput, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $exception) {
+            throw new RuntimeException('Invalid JSON payload.', 0, $exception);
+        }
+
+        if (!is_array($decoded)) {
+            throw new RuntimeException('Invalid GraphQL payload.');
+        }
+
+        return $decoded;
     }
 }
