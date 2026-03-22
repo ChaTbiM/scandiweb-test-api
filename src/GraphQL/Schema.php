@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\GraphQL;
 
+use App\GraphQL\Resolvers\CategoryResolver;
+use App\GraphQL\Resolvers\OrderResolver;
+use App\GraphQL\Resolvers\ProductResolver;
+use App\GraphQL\Types\TypeRegistry;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema as GraphQLSchema;
@@ -32,9 +36,17 @@ final class Schema
     private static function queryFields(): array
     {
         return [
-            '_placeholder' => [
-                'type' => Type::string(),
-                'resolve' => static fn (): string => 'Schema not fully wired yet.',
+            'categories' => [
+                'type' => Type::nonNull(Type::listOf(Type::nonNull(TypeRegistry::category()))),
+                'resolve' => static fn (): array => (new CategoryResolver())->resolve(),
+            ],
+            'product' => [
+                'type' => TypeRegistry::product(),
+                'args' => [
+                    'id' => Type::nonNull(Type::string()),
+                ],
+                'resolve' => static fn (mixed $rootValue, array $arguments): mixed => (new ProductResolver())
+                    ->resolve((string) ($arguments['id'] ?? '')),
             ],
         ];
     }
@@ -45,9 +57,13 @@ final class Schema
     private static function mutationFields(): array
     {
         return [
-            '_placeholder' => [
-                'type' => Type::string(),
-                'resolve' => static fn (): string => 'Schema not fully wired yet.',
+            'placeOrder' => [
+                'type' => Type::nonNull(Type::int()),
+                'args' => [
+                    'items' => Type::nonNull(Type::listOf(Type::nonNull(TypeRegistry::orderItemInput()))),
+                ],
+                'resolve' => static fn (mixed $rootValue, array $arguments): int => (new OrderResolver())
+                    ->resolve(isset($arguments['items']) && is_array($arguments['items']) ? $arguments['items'] : []),
             ],
         ];
     }
