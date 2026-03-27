@@ -9,7 +9,7 @@ use PDO;
 
 abstract class AbstractResolver
 {
-    protected PDO $pdo;
+    protected readonly PDO $pdo;
 
     public function __construct()
     {

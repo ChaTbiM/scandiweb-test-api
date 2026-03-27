@@ -8,22 +8,14 @@ use DateTimeImmutable;
 
 class Order
 {
-    private ?int $id;
-    private ?DateTimeImmutable $createdAt;
-
-    /**
-     * @var array<int, OrderItem>
-     */
-    private array $items;
-
     /**
      * @param array<int, OrderItem> $items
      */
-    public function __construct(?int $id, ?DateTimeImmutable $createdAt = null, array $items = [])
-    {
-        $this->id = $id;
-        $this->createdAt = $createdAt;
-        $this->items = $items;
+    public function __construct(
+        private readonly ?int $id,
+        private readonly ?DateTimeImmutable $createdAt = null,
+        private readonly array $items = []
+    ) {
     }
 
     /**

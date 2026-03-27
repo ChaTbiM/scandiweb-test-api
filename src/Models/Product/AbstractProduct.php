@@ -17,53 +17,22 @@ abstract class AbstractProduct
         'configurable' => ConfigurableProduct::class,
     ];
 
-    protected string $id;
-    protected string $name;
-    protected bool $inStock;
-    protected string $description;
-    protected string $brand;
-    protected string $categoryName;
-
-    /**
-     * @var array<int, string>
-     */
-    protected array $gallery;
-
-    /**
-     * @var array<int, Price>
-     */
-    protected array $prices;
-
-    /**
-     * @var array<int, AbstractAttribute>
-     */
-    protected array $attributes;
-
     /**
      * @param array<int, string> $gallery
      * @param array<int, Price> $prices
      * @param array<int, AbstractAttribute> $attributes
      */
     public function __construct(
-        string $id,
-        string $name,
-        bool $inStock,
-        string $description,
-        string $brand,
-        string $categoryName,
-        array $gallery = [],
-        array $prices = [],
-        array $attributes = []
+        protected readonly string $id,
+        protected readonly string $name,
+        protected readonly bool $inStock,
+        protected readonly string $description,
+        protected readonly string $brand,
+        protected readonly string $categoryName,
+        protected readonly array $gallery = [],
+        protected readonly array $prices = [],
+        protected readonly array $attributes = []
     ) {
-        $this->id = $id;
-        $this->name = $name;
-        $this->inStock = $inStock;
-        $this->description = $description;
-        $this->brand = $brand;
-        $this->categoryName = $categoryName;
-        $this->gallery = $gallery;
-        $this->prices = $prices;
-        $this->attributes = $attributes;
     }
 
     /**

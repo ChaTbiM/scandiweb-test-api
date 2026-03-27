@@ -8,13 +8,8 @@ use App\Models\Product\AbstractProduct;
 
 abstract class AbstractCategory
 {
-    protected int $id;
-    protected string $name;
-
-    public function __construct(int $id, string $name)
+    public function __construct(protected readonly int $id, protected readonly string $name)
     {
-        $this->id = $id;
-        $this->name = $name;
     }
 
     public function getId(): int

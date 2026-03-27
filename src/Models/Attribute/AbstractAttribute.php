@@ -14,26 +14,16 @@ abstract class AbstractAttribute
         'swatch' => SwatchAttribute::class,
     ];
 
-    protected int $id;
-    protected string $attributeId;
-    protected string $name;
-    protected string $type;
-
-    /**
-     * @var array<int, array<string, mixed>>
-     */
-    protected array $items;
-
     /**
      * @param array<int, array<string, mixed>> $items
      */
-    public function __construct(int $id, string $attributeId, string $name, string $type, array $items = [])
-    {
-        $this->id = $id;
-        $this->attributeId = $attributeId;
-        $this->name = $name;
-        $this->type = $type;
-        $this->items = $items;
+    public function __construct(
+        protected readonly int $id,
+        protected readonly string $attributeId,
+        protected readonly string $name,
+        protected readonly string $type,
+        protected readonly array $items = []
+    ) {
     }
 
     /**

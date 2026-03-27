@@ -12,7 +12,7 @@ use RuntimeException;
 
 class ProductRepository
 {
-    private PDO $pdo;
+    private readonly PDO $pdo;
 
     public function __construct(?PDO $pdo = null)
     {

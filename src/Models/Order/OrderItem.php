@@ -8,40 +8,19 @@ use JsonException;
 
 class OrderItem
 {
-    private ?int $id;
-    private ?int $orderId;
-    private string $productId;
-    private int $quantity;
-    private int $unitPriceCents;
-    private string $currencyLabel;
-    private string $currencySymbol;
-
-    /**
-     * @var array<string, string>
-     */
-    private array $selectedAttributes;
-
     /**
      * @param array<string, string> $selectedAttributes
      */
     public function __construct(
-        ?int $id,
-        ?int $orderId,
-        string $productId,
-        int $quantity,
-        int $unitPriceCents,
-        string $currencyLabel,
-        string $currencySymbol,
-        array $selectedAttributes = []
+        private readonly ?int $id,
+        private readonly ?int $orderId,
+        private readonly string $productId,
+        private readonly int $quantity,
+        private readonly int $unitPriceCents,
+        private readonly string $currencyLabel,
+        private readonly string $currencySymbol,
+        private readonly array $selectedAttributes = []
     ) {
-        $this->id = $id;
-        $this->orderId = $orderId;
-        $this->productId = $productId;
-        $this->quantity = $quantity;
-        $this->unitPriceCents = $unitPriceCents;
-        $this->currencyLabel = $currencyLabel;
-        $this->currencySymbol = $currencySymbol;
-        $this->selectedAttributes = $selectedAttributes;
     }
 
     /**

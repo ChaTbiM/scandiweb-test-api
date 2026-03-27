@@ -11,7 +11,7 @@ use PDO;
 
 class CategoryRepository
 {
-    private PDO $pdo;
+    private readonly PDO $pdo;
 
     public function __construct(?PDO $pdo = null)
     {

@@ -13,7 +13,7 @@ use Throwable;
 
 class OrderRepository
 {
-    private PDO $pdo;
+    private readonly PDO $pdo;
 
     public function __construct(?PDO $pdo = null)
     {

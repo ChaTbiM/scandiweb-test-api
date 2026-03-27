@@ -6,15 +6,11 @@ namespace App\Models;
 
 final class Price
 {
-    private float $amount;
-    private string $currencyLabel;
-    private string $currencySymbol;
-
-    public function __construct(float $amount, string $currencyLabel, string $currencySymbol)
-    {
-        $this->amount = $amount;
-        $this->currencyLabel = $currencyLabel;
-        $this->currencySymbol = $currencySymbol;
+    public function __construct(
+        private readonly float $amount,
+        private readonly string $currencyLabel,
+        private readonly string $currencySymbol
+    ) {
     }
 
     /**

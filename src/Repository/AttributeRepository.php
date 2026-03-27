@@ -10,7 +10,7 @@ use PDO;
 
 class AttributeRepository
 {
-    private PDO $pdo;
+    private readonly PDO $pdo;
 
     public function __construct(?PDO $pdo = null)
     {
