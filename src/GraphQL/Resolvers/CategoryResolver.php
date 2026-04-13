@@ -18,4 +18,11 @@ class CategoryResolver extends AbstractResolver
 
         return $categoryRepository->findAll();
     }
+
+    public function resolveByName(string $name): ?AbstractCategory
+    {
+        $categoryRepository = new CategoryRepository($this->pdo);
+
+        return $categoryRepository->findByName($name);
+    }
 }

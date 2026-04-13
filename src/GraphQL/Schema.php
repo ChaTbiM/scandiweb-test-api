@@ -40,6 +40,14 @@ final class Schema
                 'type' => Type::nonNull(Type::listOf(Type::nonNull(TypeRegistry::category()))),
                 'resolve' => static fn (): array => (new CategoryResolver())->resolve(),
             ],
+            'category' => [
+                'type' => TypeRegistry::category(),
+                'args' => [
+                    'name' => Type::nonNull(Type::string()),
+                ],
+                'resolve' => static fn (mixed $rootValue, array $arguments): mixed => (new CategoryResolver())
+                    ->resolveByName((string) ($arguments['name'] ?? '')),
+            ],
             'product' => [
                 'type' => TypeRegistry::product(),
                 'args' => [
