@@ -44,10 +44,10 @@ try {
     $queryStringPosition = strpos($requestUri, '?');
 
     if ($queryStringPosition !== false) {
-        $requestUri = substr($requestUri, 0, $queryStringPosition);
+        $cleanedRequestUri = substr($requestUri, 0, $queryStringPosition);
     }
 
-    $routeInfo = $dispatcher->dispatch($requestMethod, rawurldecode($requestUri));
+    $routeInfo = $dispatcher->dispatch($requestMethod, rawurldecode($cleanedRequestUri));
 
     switch ($routeInfo[0]) {
         case Dispatcher::NOT_FOUND:
