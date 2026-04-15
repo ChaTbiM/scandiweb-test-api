@@ -44,16 +44,16 @@ try {
     $queryStringPosition = strpos($requestUri, '?');
 
     if ($queryStringPosition !== false) {
-        $cleanedRequestUri = substr($requestUri, 0, $queryStringPosition);
+        $requestUri = substr($requestUri, 0, $queryStringPosition);
     }
 
-    $routeInfo = $dispatcher->dispatch($requestMethod, rawurldecode($cleanedRequestUri));
+    $routeInfo = $dispatcher->dispatch($requestMethod, rawurldecode($requestUri));
 
     switch ($routeInfo[0]) {
         case Dispatcher::NOT_FOUND:
             $sendJsonResponse(404, [
                 'error' => [
-                    'message' => 'Not Found',
+                    'message' => 'Not Found but app is working ! Hello World !',
                 ],
             ]);
 
