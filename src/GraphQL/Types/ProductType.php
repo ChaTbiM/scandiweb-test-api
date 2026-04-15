@@ -50,7 +50,9 @@ final class ProductType
                     'type' => Type::nonNull(Type::string()),
                     'resolve' => static fn (mixed $productValue): string => $productValue instanceof AbstractProduct
                         ? $productValue->getCategoryName()
-                        : (string) (is_array($productValue) ? ($productValue['category'] ?? $productValue['category_name'] ?? '') : ''),
+                        : (string) (is_array($productValue)
+                            ? ($productValue['category'] ?? $productValue['category_name'] ?? '')
+                            : ''),
                 ],
                 'type' => [
                     'type' => Type::nonNull(Type::string()),
@@ -62,7 +64,9 @@ final class ProductType
                     'type' => Type::nonNull(Type::listOf(Type::nonNull(Type::string()))),
                     'resolve' => static fn (mixed $productValue): array => $productValue instanceof AbstractProduct
                         ? $productValue->getGallery()
-                        : (is_array($productValue) && isset($productValue['gallery']) && is_array($productValue['gallery'])
+                        : (is_array($productValue)
+                            && isset($productValue['gallery'])
+                            && is_array($productValue['gallery'])
                             ? $productValue['gallery']
                             : []),
                 ],
@@ -70,7 +74,9 @@ final class ProductType
                     'type' => Type::nonNull(Type::listOf(Type::nonNull(TypeRegistry::price()))),
                     'resolve' => static fn (mixed $productValue): array => $productValue instanceof AbstractProduct
                         ? $productValue->getPrices()
-                        : (is_array($productValue) && isset($productValue['prices']) && is_array($productValue['prices'])
+                        : (is_array($productValue)
+                            && isset($productValue['prices'])
+                            && is_array($productValue['prices'])
                             ? $productValue['prices']
                             : []),
                 ],

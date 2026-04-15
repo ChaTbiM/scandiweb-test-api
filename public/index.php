@@ -56,6 +56,7 @@ try {
                     'message' => 'Not Found but app is working ! Hello World !',
                 ],
             ]);
+            break;
 
         case Dispatcher::METHOD_NOT_ALLOWED:
             $allowedMethods = implode(', ', $routeInfo[1]);
@@ -69,6 +70,7 @@ try {
                 ],
                 ['Allow' => $allowedMethods]
             );
+            break;
 
         case Dispatcher::FOUND:
             $handler = $routeInfo[1];

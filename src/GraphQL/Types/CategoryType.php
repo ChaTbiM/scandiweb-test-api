@@ -31,7 +31,9 @@ final class CategoryType
                     'type' => Type::nonNull(Type::listOf(Type::nonNull(TypeRegistry::product()))),
                     'resolve' => static fn (mixed $categoryValue): array => $categoryValue instanceof AbstractCategory
                         ? $categoryValue->getProducts()
-                        : (is_array($categoryValue) && isset($categoryValue['products']) && is_array($categoryValue['products'])
+                        : (is_array($categoryValue)
+                            && isset($categoryValue['products'])
+                            && is_array($categoryValue['products'])
                             ? $categoryValue['products']
                             : []),
                 ],

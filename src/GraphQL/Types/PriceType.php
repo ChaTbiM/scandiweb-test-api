@@ -31,7 +31,9 @@ final class PriceType
                             ];
                         }
 
-                        return is_array($priceValue) && isset($priceValue['currency']) && is_array($priceValue['currency'])
+                        return is_array($priceValue)
+                            && isset($priceValue['currency'])
+                            && is_array($priceValue['currency'])
                             ? $priceValue['currency']
                             : ['label' => '', 'symbol' => ''];
                     },
