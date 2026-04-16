@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Models\Category;
+namespace App\Models;
 
-use App\Models\Product\AbstractProduct;
-
-abstract class AbstractCategory
+// Simple data holder for category information.
+// Does not extend/implement anything — YAGNI: only one category type exists.
+final class Category
 {
     public function __construct(protected readonly int $id, protected readonly string $name)
     {
@@ -21,11 +21,6 @@ abstract class AbstractCategory
     {
         return $this->name;
     }
-
-    /**
-     * @return array<int, AbstractProduct>
-     */
-    abstract public function getProducts(): array;
 
     /**
      * @return array<string, mixed>
