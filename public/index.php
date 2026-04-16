@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Bootstrap;
 use App\Controller\GraphQL;
 use Dotenv\Dotenv;
 use FastRoute\Dispatcher;
@@ -24,6 +25,8 @@ $sendJsonResponse = static function (int $statusCode, array $payload, array $hea
 try {
     $dotenv = Dotenv::createImmutable(dirname(__DIR__));
     $dotenv->safeLoad();
+
+    GraphQL::setSchema(Bootstrap::buildSchema());
 
     $allowedOrigin = $_ENV['ALLOWED_ORIGIN'] ?? 'http://localhost:5173';
     header('Access-Control-Allow-Origin: ' . $allowedOrigin);

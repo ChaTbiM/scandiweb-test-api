@@ -13,12 +13,21 @@ use Throwable;
 
 class GraphQL
 {
+    private static ?Schema $schema = null;
+
+    public static function setSchema(Schema $schema): void
+    {
+        self::$schema = $schema;
+    }
+
     public static function handle(): string
     {
         header('Content-Type: application/json; charset=UTF-8');
 
         try {
             FormattedError::setInternalErrorMessage('Internal Server Error');
+
+            $schema = self::$schema ?? throw new RuntimeException('Schema not initialized.');
 
             $rawInput = file_get_contents('php://input');
 
@@ -37,7 +46,7 @@ class GraphQL
             $operationName = $input['operationName'] ?? null;
 
             $result = GraphQLBase::executeQuery(
-                Schema::build(),
+                $schema->build(),
                 $query,
                 null,
                 null,

@@ -4,19 +4,16 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Database\Connection;
 use App\Models\Price;
 use App\Models\Product\AbstractProduct;
+use App\Repository\Contracts\ProductRepositoryInterface;
 use PDO;
 use RuntimeException;
 
-class ProductRepository
+class ProductRepository implements ProductRepositoryInterface
 {
-    private readonly PDO $pdo;
-
-    public function __construct(?PDO $pdo = null)
+    public function __construct(private readonly PDO $pdo)
     {
-        $this->pdo = $pdo ?? Connection::getInstance();
     }
 
     /**

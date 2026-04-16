@@ -4,20 +4,17 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Database\Connection;
 use App\Models\Order\OrderItem;
+use App\Repository\Contracts\OrderRepositoryInterface;
 use JsonException;
 use PDO;
 use RuntimeException;
 use Throwable;
 
-class OrderRepository
+class OrderRepository implements OrderRepositoryInterface
 {
-    private readonly PDO $pdo;
-
-    public function __construct(?PDO $pdo = null)
+    public function __construct(private readonly PDO $pdo)
     {
-        $this->pdo = $pdo ?? Connection::getInstance();
     }
 
     /**

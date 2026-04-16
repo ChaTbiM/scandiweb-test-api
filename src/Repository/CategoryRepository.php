@@ -4,22 +4,18 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Database\Connection;
-use App\Models\Category\AbstractCategory;
-use App\Models\Category\Category;
+use App\Models\Category;
+use App\Repository\Contracts\CategoryRepositoryInterface;
 use PDO;
 
-class CategoryRepository
+class CategoryRepository implements CategoryRepositoryInterface
 {
-    private readonly PDO $pdo;
-
-    public function __construct(?PDO $pdo = null)
+    public function __construct(private readonly PDO $pdo)
     {
-        $this->pdo = $pdo ?? Connection::getInstance();
     }
 
     /**
-     * @return array<int, AbstractCategory>
+     * @return array<int, Category>
      */
     public function findAll(): array
     {
@@ -27,12 +23,12 @@ class CategoryRepository
         $categoryRows = $categoryQuery->fetchAll();
 
         return array_map(
-            static fn (array $categoryRow): AbstractCategory => self::hydrateCategory($categoryRow),
+            static fn (array $categoryRow): Category => self::hydrateCategory($categoryRow),
             $categoryRows
         );
     }
 
-    public function findByName(string $name): ?AbstractCategory
+    public function findByName(string $name): ?Category
     {
         $categoryQuery = $this->pdo->prepare('SELECT id, name FROM categories WHERE name = :name LIMIT 1');
         $categoryQuery->execute(['name' => $name]);
@@ -48,7 +44,7 @@ class CategoryRepository
     /**
      * @param array<string, mixed> $categoryRow
      */
-    private static function hydrateCategory(array $categoryRow): AbstractCategory
+    private static function hydrateCategory(array $categoryRow): Category
     {
         return new Category(
             (int) ($categoryRow['id'] ?? 0),

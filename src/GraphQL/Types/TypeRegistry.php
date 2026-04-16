@@ -4,51 +4,59 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Types;
 
+use App\Repository\Contracts\AttributeRepositoryInterface;
+use App\Repository\Contracts\ProductRepositoryInterface;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\ObjectType;
 
 final class TypeRegistry
 {
-    private static ?ObjectType $currencyType = null;
-    private static ?ObjectType $priceType = null;
-    private static ?ObjectType $attributeItemType = null;
-    private static ?ObjectType $attributeSetType = null;
-    private static ?ObjectType $productType = null;
-    private static ?ObjectType $categoryType = null;
-    private static ?InputObjectType $orderItemInputType = null;
+    private ?ObjectType $currencyType = null;
+    private ?ObjectType $priceType = null;
+    private ?ObjectType $attributeItemType = null;
+    private ?ObjectType $attributeSetType = null;
+    private ?ObjectType $productType = null;
+    private ?ObjectType $categoryType = null;
+    private ?InputObjectType $orderItemInputType = null;
 
-    public static function currency(): ObjectType
-    {
-        return self::$currencyType ??= CurrencyType::build();
+    public function __construct(
+        private readonly ProductRepositoryInterface $productRepository,
+        private readonly AttributeRepositoryInterface $attributeRepository
+    ) {
     }
 
-    public static function price(): ObjectType
+    public function currency(): ObjectType
     {
-        return self::$priceType ??= PriceType::build();
+        return $this->currencyType ??= CurrencyType::build();
     }
 
-    public static function attributeItem(): ObjectType
+    public function price(): ObjectType
     {
-        return self::$attributeItemType ??= AttributeItemType::build();
+        return $this->priceType ??= PriceType::build($this);
     }
 
-    public static function attributeSet(): ObjectType
+    public function attributeItem(): ObjectType
     {
-        return self::$attributeSetType ??= AttributeSetType::build();
+        return $this->attributeItemType ??= AttributeItemType::build();
     }
 
-    public static function product(): ObjectType
+    public function attributeSet(): ObjectType
     {
-        return self::$productType ??= ProductType::build();
+        return $this->attributeSetType ??= AttributeSetType::build($this);
     }
 
-    public static function category(): ObjectType
+    public function product(): ObjectType
     {
-        return self::$categoryType ??= CategoryType::build();
+        return $this->productType ??= ProductType::build($this, $this->attributeRepository);
     }
 
-    public static function orderItemInput(): InputObjectType
+    public function category(): ObjectType
     {
-        return self::$orderItemInputType ??= OrderItemInputType::build();
+        return $this->categoryType ??= CategoryType::build($this, $this->productRepository);
+    }
+
+    public function orderItemInput(): InputObjectType
+    {
+        return $this->orderItemInputType ??= OrderItemInputType::build();
     }
 }

@@ -4,25 +4,26 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Resolvers;
 
-use App\Models\Category\AbstractCategory;
-use App\Repository\CategoryRepository;
+use App\Models\Category;
+use App\Repository\Contracts\CategoryRepositoryInterface;
 
-class CategoryResolver extends AbstractResolver
+class CategoryResolver
 {
+    public function __construct(
+        private readonly CategoryRepositoryInterface $categoryRepository
+    ) {
+    }
+
     /**
-     * @return array<int, AbstractCategory>
+     * @return array<int, Category>
      */
     public function resolve(): array
     {
-        $categoryRepository = new CategoryRepository($this->pdo);
-
-        return $categoryRepository->findAll();
+        return $this->categoryRepository->findAll();
     }
 
-    public function resolveByName(string $name): ?AbstractCategory
+    public function resolveByName(string $name): ?Category
     {
-        $categoryRepository = new CategoryRepository($this->pdo);
-
-        return $categoryRepository->findByName($name);
+        return $this->categoryRepository->findByName($name);
     }
 }

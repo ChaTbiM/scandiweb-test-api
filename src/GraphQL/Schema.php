@@ -15,17 +15,25 @@ use GraphQL\Type\SchemaConfig;
 
 final class Schema
 {
-    public static function build(): GraphQLSchema
+    public function __construct(
+        private readonly CategoryResolver $categoryResolver,
+        private readonly ProductResolver $productResolver,
+        private readonly OrderResolver $orderResolver,
+        private readonly TypeRegistry $typeRegistry
+    ) {
+    }
+
+    public function build(): GraphQLSchema
     {
         return new GraphQLSchema(
             (new SchemaConfig())
                 ->setQuery(new ObjectType([
                     'name' => 'Query',
-                    'fields' => self::queryFields(),
+                    'fields' => $this->queryFields(),
                 ]))
                 ->setMutation(new ObjectType([
                     'name' => 'Mutation',
-                    'fields' => self::mutationFields(),
+                    'fields' => $this->mutationFields(),
                 ]))
         );
     }
@@ -33,27 +41,27 @@ final class Schema
     /**
      * @return array<string, array<string, mixed>>
      */
-    private static function queryFields(): array
+    private function queryFields(): array
     {
         return [
             'categories' => [
-                'type' => Type::nonNull(Type::listOf(Type::nonNull(TypeRegistry::category()))),
-                'resolve' => static fn (): array => (new CategoryResolver())->resolve(),
+                'type' => Type::nonNull(Type::listOf(Type::nonNull($this->typeRegistry->category()))),
+                'resolve' => fn (): array => $this->categoryResolver->resolve(),
             ],
             'category' => [
-                'type' => TypeRegistry::category(),
+                'type' => $this->typeRegistry->category(),
                 'args' => [
                     'name' => Type::nonNull(Type::string()),
                 ],
-                'resolve' => static fn (mixed $rootValue, array $arguments): mixed => (new CategoryResolver())
+                'resolve' => fn (mixed $rootValue, array $arguments): mixed => $this->categoryResolver
                     ->resolveByName((string) ($arguments['name'] ?? '')),
             ],
             'product' => [
-                'type' => TypeRegistry::product(),
+                'type' => $this->typeRegistry->product(),
                 'args' => [
                     'id' => Type::nonNull(Type::string()),
                 ],
-                'resolve' => static fn (mixed $rootValue, array $arguments): mixed => (new ProductResolver())
+                'resolve' => fn (mixed $rootValue, array $arguments): mixed => $this->productResolver
                     ->resolve((string) ($arguments['id'] ?? '')),
             ],
         ];
@@ -62,15 +70,15 @@ final class Schema
     /**
      * @return array<string, array<string, mixed>>
      */
-    private static function mutationFields(): array
+    private function mutationFields(): array
     {
         return [
             'placeOrder' => [
                 'type' => Type::nonNull(Type::int()),
                 'args' => [
-                    'items' => Type::nonNull(Type::listOf(Type::nonNull(TypeRegistry::orderItemInput()))),
+                    'items' => Type::nonNull(Type::listOf(Type::nonNull($this->typeRegistry->orderItemInput()))),
                 ],
-                'resolve' => static fn (mixed $rootValue, array $arguments): int => (new OrderResolver())
+                'resolve' => fn (mixed $rootValue, array $arguments): int => $this->orderResolver
                     ->resolve(isset($arguments['items']) && is_array($arguments['items']) ? $arguments['items'] : []),
             ],
         ];
