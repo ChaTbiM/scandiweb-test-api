@@ -1,13 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * Database Seeder
  *
  * Parses data.json and populates the database with categories,
  * products, galleries, attributes, attribute items, and prices.
  */
+
+declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -75,7 +75,11 @@ echo "Seeding database...\n\n";
 
 // Clear existing data
 $pdo->exec("SET FOREIGN_KEY_CHECKS = 0");
-$tables = ['order_items', 'orders', 'prices', 'attribute_items', 'attribute_sets', 'product_gallery', 'products', 'categories'];
+$tables = [
+    'order_items', 'orders', 'prices',
+    'attribute_items', 'attribute_sets',
+    'product_gallery', 'products', 'categories',
+];
 foreach ($tables as $table) {
     $pdo->exec("TRUNCATE TABLE {$table}");
 }
@@ -129,7 +133,9 @@ foreach ($products as $product) {
     $categoryId = $categoryMap[$product['category']] ?? null;
 
     if ($categoryId === null) {
-        fwrite(STDERR, "  WARNING: Category '{$product['category']}' not found for product '{$product['id']}', skipping\n");
+        $msg = "  WARNING: Category '{$product['category']}'"
+            . " not found for product '{$product['id']}', skipping\n";
+        fwrite(STDERR, $msg);
         continue;
     }
 

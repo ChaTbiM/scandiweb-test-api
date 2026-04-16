@@ -9,7 +9,9 @@
     "migrate": "php migrations/run.php",
     "migrate:fresh": "php migrations/run.php --fresh",
     "seed": "php seeds/seeder.php",
-    "lint": "./vendor/bin/phpcs"
+    "lint": "./vendor/bin/phpcs",
+    "fix": "./vendor/bin/php-cs-fixer fix",
+    "fix:dry": "./vendor/bin/php-cs-fixer fix --dry-run --diff"
   },
   "autoload": {
     "psr-4": {
@@ -23,6 +25,13 @@
     "vlucas/phpdotenv": "^5.6"
   },
   "require-dev": {
-    "squizlabs/php_codesniffer": "^3.10"
+    "squizlabs/php_codesniffer": "^3.10",
+    "slevomat/coding-standard": "^8.22",
+    "friendsofphp/php-cs-fixer": "^3.95"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
   }
 }
