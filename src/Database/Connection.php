@@ -20,11 +20,11 @@ final class Connection
             return self::$instance;
         }
 
-        $host = $_ENV['DB_HOST'] ?? '127.0.0.1';
-        $port = $_ENV['DB_PORT'] ?? '3306';
-        $database = $_ENV['DB_NAME'] ?? '';
-        $username = $_ENV['DB_USER'] ?? 'root';
-        $password = $_ENV['DB_PASS'] ?? '';
+        $host = $_ENV['DB_HOST'] ?? getenv('DB_HOST') ?: '127.0.0.1';
+        $port = $_ENV['DB_PORT'] ?? getenv('DB_PORT') ?: '3306';
+        $database = $_ENV['DB_NAME'] ?? getenv('DB_NAME') ?: '';
+        $username = $_ENV['DB_USER'] ?? getenv('DB_USER') ?: 'root';
+        $password = $_ENV['DB_PASS'] ?? getenv('DB_PASS') ?: '';
 
         $dsn = sprintf('mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4', $host, $port, $database);
 

@@ -28,7 +28,7 @@ try {
 
     GraphQL::setSchema(Bootstrap::buildSchema());
 
-    $allowedOrigin = $_ENV['ALLOWED_ORIGIN'] ?? 'http://localhost:5173';
+    $allowedOrigin = $_ENV['ALLOWED_ORIGIN'] ?? getenv('ALLOWED_ORIGIN') ?: 'http://localhost:5173';
     header('Access-Control-Allow-Origin: ' . $allowedOrigin);
     header('Access-Control-Allow-Methods: POST, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, Authorization');
@@ -83,7 +83,9 @@ try {
 } catch (Throwable $throwable) {
     $sendJsonResponse(500, [
         'error' => [
-            'message' => 'Internal Server Error',
+            'message' => 'Internal Server Error: ' . $throwable->getMessage(),
+            'file' => $throwable->getFile(),
+            'line' => $throwable->getLine()
         ],
     ]);
 }
