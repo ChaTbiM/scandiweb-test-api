@@ -20,33 +20,41 @@ final class AttributeSetType
                         'type' => Type::nonNull(Type::string()),
                         'resolve' => static fn (mixed $attributeValue): string =>
                             $attributeValue instanceof AbstractAttribute
-                            ? $attributeValue->getAttributeId()
-                            : (string) (is_array($attributeValue) ? ($attributeValue['id'] ?? '') : ''),
+                                ? $attributeValue->getAttributeId()
+                                : (string) (is_array($attributeValue)
+                                    ? ($attributeValue['id'] ?? '')
+                                    : ''),
                     ],
                     'name' => [
                         'type' => Type::nonNull(Type::string()),
                         'resolve' => static fn (mixed $attributeValue): string =>
                             $attributeValue instanceof AbstractAttribute
-                            ? $attributeValue->getName()
-                            : (string) (is_array($attributeValue) ? ($attributeValue['name'] ?? '') : ''),
+                                ? $attributeValue->getName()
+                                : (string) (is_array($attributeValue)
+                                    ? ($attributeValue['name'] ?? '')
+                                    : ''),
                     ],
                     'type' => [
                         'type' => Type::nonNull(Type::string()),
                         'resolve' => static fn (mixed $attributeValue): string =>
                             $attributeValue instanceof AbstractAttribute
-                            ? $attributeValue->getInputType()
-                            : (string) (is_array($attributeValue) ? ($attributeValue['type'] ?? '') : ''),
+                                ? $attributeValue->getInputType()
+                                : (string) (is_array($attributeValue)
+                                    ? ($attributeValue['type'] ?? '')
+                                    : ''),
                     ],
                     'items' => [
-                        'type' => Type::nonNull(Type::listOf(Type::nonNull($registry->attributeItem()))),
+                        'type' => Type::nonNull(
+                            Type::listOf(Type::nonNull($registry->attributeItem()))
+                        ),
                         'resolve' => static fn (mixed $attributeValue): array =>
                             $attributeValue instanceof AbstractAttribute
-                            ? $attributeValue->getItems()
-                            : (is_array($attributeValue)
-                                && isset($attributeValue['items'])
-                                && is_array($attributeValue['items'])
-                                ? $attributeValue['items']
-                                : []),
+                                ? $attributeValue->getItems()
+                                : (is_array($attributeValue)
+                                    && isset($attributeValue['items'])
+                                    && is_array($attributeValue['items'])
+                                    ? $attributeValue['items']
+                                    : []),
                     ],
                 ];
             },

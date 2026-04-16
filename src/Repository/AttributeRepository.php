@@ -29,7 +29,8 @@ class AttributeRepository implements AttributeRepositoryInterface
                 attribute_items.display_value,
                 attribute_items.value
              FROM attribute_sets
-             LEFT JOIN attribute_items ON attribute_items.attribute_set_id = attribute_sets.id
+             LEFT JOIN attribute_items
+                 ON attribute_items.attribute_set_id = attribute_sets.id
              WHERE attribute_sets.product_id = :productId
              ORDER BY attribute_sets.id ASC, attribute_items.id ASC'
         );
@@ -69,10 +70,11 @@ class AttributeRepository implements AttributeRepositoryInterface
         }
 
         return array_values(array_map(
-            static fn (array $attributeGroup): AbstractAttribute => AbstractAttribute::fromRow(
-                $attributeGroup['row'],
-                $attributeGroup['items']
-            ),
+            static fn (array $attributeGroup): AbstractAttribute =>
+                AbstractAttribute::fromRow(
+                    $attributeGroup['row'],
+                    $attributeGroup['items']
+                ),
             $attributesBySetId
         ));
     }
